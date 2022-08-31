@@ -1,10 +1,9 @@
 <div class="app">
     <h1>Film List</h1>
     <div class="search">
-        <input type="text" #search placeholder="Search a movie">
-        <img (click)="getMovies(search.value)" src="../../../assets/search.svg" alt="Search">
+        <input type="text" #movieSearchInput placeholder="Search a movie">
     </div>
-    <div *ngIf="movies.length > 0; else empty" class="container">
+    <div *ngIf="(movies$ | async) as movies ; else empty" class="container">
         <app-card-movie *ngFor="let movie of movies" [movie]="movie"></app-card-movie>
     </div>
     <ng-template #empty class="empty">
