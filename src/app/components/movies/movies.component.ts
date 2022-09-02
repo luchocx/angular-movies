@@ -24,7 +24,6 @@ export class MoviesComponent implements OnInit {
       }),
       filter((searchTerm: string) => searchTerm.length > 3),
       debounceTime(500),
-      distinct(),
       switchMap((searchTerm: string) => this.movieService.getMovies(searchTerm))
     )
   }
