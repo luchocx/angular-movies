@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, distinct, filter, fromEvent, map, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { debounceTime, filter, fromEvent, map, Observable, switchMap } from 'rxjs';
 import { Movie } from 'src/app/interfaces/movies';
 import { MovieService } from 'src/app/services/movie.service';
 
@@ -8,29 +8,39 @@ import { MovieService } from 'src/app/services/movie.service';
   templateUrl: './movies.component.html',
   styleUrls: ['./movies.component.css']
 })
-export class MoviesComponent implements OnInit {
 
-  movies: Movie[] = []
-  @ViewChild('movieSearchInput', { static: true }) movieSearchInput!: ElementRef
-  movies$!: Observable<Movie[]>
+export class MoviesComponent implements OnInit {
+  @ViewChild('movieSearchInput', { static: true }) movieSearchInput!: ElementRef;
+  movies: Movie[] = [];
+  movies$!: Observable<Movie[]>;
+  showEmptyMessage: boolean = false;
   
   constructor(private movieService: MovieService) { }
 
   ngOnInit(): void {
+    window.onload = () => {
+      this.movieSearchInput.nativeElement.focus();
+    };
+
     this.movies$ = fromEvent<Event>(this.movieSearchInput.nativeElement, 'keyup').pipe(
       map((event: Event) => {
-        const searchTerm = (event.target as HTMLInputElement).value
-        return searchTerm
+        const searchTerm = (event.target as HTMLInputElement).value;
+        return searchTerm;
       }),
       filter((searchTerm: string) => searchTerm.length > 3),
-      debounceTime(500),
+      debounceTime(400),
       switchMap((searchTerm: string) => this.movieService.getMovies(searchTerm))
     )
   }
   
-  // getMovies(searchTerm: string) {
-  //   this.movieService.getMovies(searchTerm).subscribe(movies => {
-  //       this.movies = movies !== undefined ? movies : []
-  //   })
-  // }
+  doSearch(): void {
+    const searchTerm = (this.movieSearchInput.nativeElement as HTMLInputElement).value;
+
+    this.movieService.getMovies(searchTerm).subscribe(
+      (movies: Movie[]) => {
+        this.movies = movies;
+        this.showEmptyMessage = this.movies.length === 0;
+      }
+    );
+  }
 }

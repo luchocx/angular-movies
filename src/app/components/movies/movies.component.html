@@ -1,12 +1,15 @@
 <div class="app">
     <h1>Film List</h1>
+
     <div class="search">
-        <input type="text" #movieSearchInput placeholder="Search a movie">
+        <input type="text" #movieSearchInput placeholder="Search movies">
     </div>
-    <div *ngIf="(movies$ | async) as movies ; else empty" class="container">
+
+    <div class="container" *ngIf="(movies$ | async) as movies">
         <app-card-movie *ngFor="let movie of movies" [movie]="movie"></app-card-movie>
     </div>
-    <ng-template #empty class="empty">
-        <h3>No movies found</h3>
-    </ng-template>
+
+    <ng-container *ngIf="showEmptyMessage">
+        <h3 class="empty">No movies found</h3>
+    </ng-container>
 </div>
